@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Group Shuffler</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add SheetJS library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Classroom Group Shuffler</h1>
+            <p>Create optimal student groups with smart rotation to ensure diverse collaboration</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="file-drop-area" id="dropArea">
+            <i class="file-icon fas fa-file-excel"></i>
+            <div class="file-info">Drag & drop your Excel file here or click to browse</div>
+            <div class="file-info"><small>Excel file must contain "full names" and "tag" columns</small></div>
+            <div id="fileNameDisplay"></div>
+            <input type="file" accept=".xlsx,.xls" class="file-input" id="fileInput">
+        </div>
+
+        <div class="controls">
+            <button id="loadExcelBtn" class="btn btn-primary">
+                <i class="fas fa-file-import"></i> Load Students from Excel
+            </button>
+            <button id="createStructureBtn" class="btn btn-success">
+                <i class="fas fa-random"></i> Create Group Structure
+            </button>
+            <button id="exportSessionsBtn" class="btn btn-warning btn-disabled" disabled>
+                <i class="fas fa-file-export"></i> Export to Excel
+            </button>
+        </div>
+        <div id="studentFilterContainer" class="student-filter-container" style="display: none;">
+            <label for="studentFilter">
+                <i class="fas fa-search"></i> Find Student:
+            </label>
+            <select id="studentFilter" class="student-filter">
+                <option value="">All Students</option>
+            </select>
+        </div>
+
+        <div id="statusMessage" style="display: none;" class="status-message"></div>
+
+        <div class="sessions-wrapper">
+            <div class="session-tabs" id="sessionTabs"></div>
+            <div id="sessionsContainer" class="sessions-container">
+                <div class="empty-state">
+                    <i class="fas fa-users empty-state-icon"></i>
+                    <h3>No Groups Created Yet</h3>
+                    <p>Load students from Excel and click "Create Group Structure" to generate groups</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
