@@ -126,7 +126,9 @@ class GroupShuffler {
                     // Populate student filter dropdown
                     this.populateStudentDropdown();
 
-                    this.showStatus(`Successfully loaded ${this.students.length} students.`);
+                    // Count ASC students
+                    const ascCount = this.students.filter(s => s.tag === 'ASC').length;
+                    this.showStatus(`Successfully loaded ${this.students.length} students (including ${ascCount} ASC students).`);
                 } else {
                     this.showStatus("Excel file must contain 'full names' and 'tag' columns", 'error');
                 }
@@ -182,120 +184,194 @@ class GroupShuffler {
     }
 
     createStructure() {
-        // If no students loaded, generate default ones with full names
-        if (!this.students.length)
-        {
+        // If no students loaded, return
+        if (!this.students.length) {
             return;
         }
 
         const numSessions = 12;
-        const groupSize = 4;
+        const coreGroupSize = 4; // Core group size
+        const totalGroupSize = coreGroupSize + 2; // Including 2 substitutes
         this.sessions = [];
 
-        // Track ASC history for each student (which teammates they've been with when ASC)
+        // Track ASC history for each student (which teammates they've been with)
         const ascHistory = {};
-        this.students.forEach(s => { ascHistory[s.name] = new Set(); });
+        this.students.forEach(s => {
+            ascHistory[s.name] = new Set();
+        });
 
-        // Find actual ASC students from the loaded data
+        // Find all ASC students from the loaded data
         const ascStudents = this.students.filter(s => s.tag === 'ASC');
 
         for (let sess = 1; sess <= numSessions; sess++) {
             const sessionGroups = [];
 
-            // --- Select an actual ASC student (if any) and form their group ---
-            if (ascStudents.length > 0) {
-                let eligible = [];
+            // Track which students are already assigned to groups in this session
+            const assignedStudents = new Set();
 
-                // Find eligible ASC students (those who can still be paired with enough new students)
-                for (let s of ascStudents) {
-                    const available = new Set(
-                        this.students
-                            .filter(stu => stu.name !== s.name)
-                            .map(stu => stu.name)
+            // First, handle groups with ASC students (one ASC student per group)
+            const eligibleAscStudents = [...ascStudents];
+            this.shuffleArray(eligibleAscStudents);
+
+            for (const ascStudent of eligibleAscStudents) {
+                // Skip if this ASC student is already assigned
+                if (assignedStudents.has(ascStudent.name)) continue;
+
+                // Find eligible teammates who haven't been with this ASC student before
+                // and aren't already assigned to a group in this session
+                const availableStudents = this.students.filter(stu =>
+                    stu.name !== ascStudent.name &&
+                    !assignedStudents.has(stu.name) &&
+                    stu.tag !== 'ASC' && // Ensure no other ASC students in this group
+                    !ascHistory[ascStudent.name].has(stu.name)
+                );
+
+                // If we don't have enough available students who haven't been with this ASC student before,
+                // reset the history for this ASC student
+                if (availableStudents.length < coreGroupSize - 1) {
+                    ascHistory[ascStudent.name] = new Set();
+
+                    // Try again with reset history
+                    const resetAvailableStudents = this.students.filter(stu =>
+                        stu.name !== ascStudent.name &&
+                        !assignedStudents.has(stu.name) &&
+                        stu.tag !== 'ASC' // Ensure no other ASC students in this group
                     );
 
-                    // Remove students already grouped with this student when they were ASC
-                    if (ascHistory[s.name]) {
-                        ascHistory[s.name].forEach(name => available.delete(name));
+                    // If we still don't have enough students, skip this ASC student for this session
+                    if (resetAvailableStudents.length < coreGroupSize - 1) {
+                        continue;
                     }
 
-                    if (available.size >= groupSize - 1) {
-                        eligible.push(s);
+                    // Create a group with this ASC student
+                    const teammates = this.getRandomItems(resetAvailableStudents, coreGroupSize - 1);
+
+                    // Create a group with core members
+                    const group = [{ ...ascStudent }];
+                    teammates.forEach(student => {
+                        group.push({ ...student });
+                        assignedStudents.add(student.name);
+                        ascHistory[ascStudent.name].add(student.name);
+                    });
+
+                    // Add substitutes
+                    const possibleSubstitutes = this.students.filter(stu =>
+                        !assignedStudents.has(stu.name) &&
+                        stu.tag !== 'ASC' // No ASC students as substitutes
+                    );
+
+                    if (possibleSubstitutes.length >= 2) {
+                        const substitutes = this.getRandomItems(possibleSubstitutes, 2);
+                        substitutes.forEach(sub => {
+                            group.push({ ...sub, isSubstitute: true });
+                            assignedStudents.add(sub.name);
+                        });
+                    } else {
+                        // Not enough students for substitutes, use duplicates from other groups
+                        const duplicates = this.getRandomItems(this.students.filter(s => s.tag !== 'ASC'), 2);
+                        duplicates.forEach(dup => {
+                            group.push({ ...dup, isSubstitute: true, isDuplicate: true });
+                        });
                     }
-                }
 
-                if (!eligible.length) {
-                    // Reset histories if no candidate qualifies
-                    ascStudents.forEach(s => { ascHistory[s.name] = new Set(); });
-                    eligible = [...ascStudents];
-                }
-
-                const ascStudent = this.getRandomItem(eligible);
-
-                // Get available students who haven't been with this ASC before
-                const availableNames = this.students
-                    .filter(stu => stu.name !== ascStudent.name)
-                    .map(stu => stu.name)
-                    .filter(name => !ascHistory[ascStudent.name].has(name));
-
-                const teammates = this.getRandomItems(availableNames, groupSize - 1);
-
-                // Update ASC history
-                teammates.forEach(name => {
-                    ascHistory[ascStudent.name].add(name);
-                });
-
-                // Create ASC group
-                const ascGroup = [{ ...ascStudent }]; // Keep original tag, no need to override
-                for (let name of teammates) {
-                    const studentObj = this.students.find(stu => stu.name === name);
-                    ascGroup.push({ ...studentObj });
-                }
-                sessionGroups.push(ascGroup);
-
-                // --- Group the remaining students ---
-                const usedNames = new Set([ascStudent.name, ...teammates]);
-                let remaining = this.students.filter(s => !usedNames.has(s.name));
-                this.shuffleArray(remaining);
-
-                const groupsNeeded = Math.ceil(remaining.length / groupSize);
-                const totalSlots = groupsNeeded * groupSize;
-                const duplicatesNeeded = totalSlots - remaining.length;
-
-                if (duplicatesNeeded > 0) {
-                    const duplicates = this.getRandomItems(remaining, duplicatesNeeded);
-                    remaining = [...remaining, ...duplicates];
-                    this.shuffleArray(remaining);
-                }
-
-                for (let i = 0; i < remaining.length; i += groupSize) {
-                    const group = remaining.slice(i, i + groupSize);
                     sessionGroups.push(group);
-                }
-            } else {
-                // No ASC students, just create regular groups
-                let allStudents = [...this.students];
-                this.shuffleArray(allStudents);
+                    assignedStudents.add(ascStudent.name);
+                } else {
+                    // We have enough available students, create the group
+                    const teammates = this.getRandomItems(availableStudents, coreGroupSize - 1);
 
-                const groupsNeeded = Math.ceil(allStudents.length / groupSize);
-                const totalSlots = groupsNeeded * groupSize;
-                const duplicatesNeeded = totalSlots - allStudents.length;
+                    // Create a group with core members
+                    const group = [{ ...ascStudent }];
+                    teammates.forEach(student => {
+                        group.push({ ...student });
+                        assignedStudents.add(student.name);
+                        ascHistory[ascStudent.name].add(student.name);
+                    });
 
-                if (duplicatesNeeded > 0) {
-                    const duplicates = this.getRandomItems(allStudents, duplicatesNeeded);
-                    allStudents = [...allStudents, ...duplicates];
-                    this.shuffleArray(allStudents);
-                }
+                    // Add substitutes
+                    const possibleSubstitutes = this.students.filter(stu =>
+                        !assignedStudents.has(stu.name) &&
+                        stu.tag !== 'ASC' // No ASC students as substitutes
+                    );
 
-                for (let i = 0; i < allStudents.length; i += groupSize) {
-                    const group = allStudents.slice(i, i + groupSize);
+                    if (possibleSubstitutes.length >= 2) {
+                        const substitutes = this.getRandomItems(possibleSubstitutes, 2);
+                        substitutes.forEach(sub => {
+                            group.push({ ...sub, isSubstitute: true });
+                            assignedStudents.add(sub.name);
+                        });
+                    } else {
+                        // Not enough students for substitutes, use duplicates from other groups
+                        const duplicates = this.getRandomItems(this.students.filter(s => s.tag !== 'ASC'), 2);
+                        duplicates.forEach(dup => {
+                            group.push({ ...dup, isSubstitute: true, isDuplicate: true });
+                        });
+                    }
+
                     sessionGroups.push(group);
+                    assignedStudents.add(ascStudent.name);
                 }
             }
 
-            // *** NEW CODE: Randomize the order of groups in the session ***
+            // Now handle remaining students without ASC
+            const remainingStudents = this.students.filter(s => !assignedStudents.has(s.name));
+            this.shuffleArray(remainingStudents);
+
+            // Calculate how many groups we need for remaining students
+            const groupsNeeded = Math.ceil(remainingStudents.length / coreGroupSize);
+
+            for (let i = 0; i < groupsNeeded; i++) {
+                // Get the next batch of students for the core group
+                const startIdx = i * coreGroupSize;
+                const endIdx = Math.min(startIdx + coreGroupSize, remainingStudents.length);
+                const coreMembers = remainingStudents.slice(startIdx, endIdx);
+
+                // If we don't have enough students for a complete core group, supplement with duplicates
+                if (coreMembers.length < coreGroupSize) {
+                    const duplicatesNeeded = coreGroupSize - coreMembers.length;
+                    const duplicates = this.getRandomItems(this.students.filter(s => s.tag !== 'ASC'), duplicatesNeeded);
+                    duplicates.forEach(dup => {
+                        coreMembers.push({ ...dup, isDuplicate: true });
+                    });
+                }
+
+                // Add substitutes from the remaining students if possible
+                const group = [...coreMembers];
+                const availableForSubs = this.students.filter(s =>
+                    !coreMembers.some(member => member.name === s.name) &&
+                    !assignedStudents.has(s.name) &&
+                    s.tag !== 'ASC' // No ASC students as substitutes
+                );
+
+                if (availableForSubs.length >= 2) {
+                    const substitutes = this.getRandomItems(availableForSubs, 2);
+                    substitutes.forEach(sub => {
+                        group.push({ ...sub, isSubstitute: true });
+                        assignedStudents.add(sub.name);
+                    });
+                } else {
+                    // Not enough students for substitutes, use duplicates
+                    const duplicateSubs = this.getRandomItems(this.students.filter(s => s.tag !== 'ASC'), 2);
+                    duplicateSubs.forEach(dup => {
+                        group.push({ ...dup, isSubstitute: true, isDuplicate: true });
+                    });
+                }
+
+                // Add the group to the session
+                sessionGroups.push(group);
+
+                // Mark core members as assigned
+                coreMembers.forEach(member => {
+                    if (!member.isDuplicate) {
+                        assignedStudents.add(member.name);
+                    }
+                });
+            }
+
+            // Shuffle the order of groups in this session
             this.shuffleArray(sessionGroups);
 
+            // Add the session to our sessions array
             this.sessions.push(sessionGroups);
         }
 
@@ -306,7 +382,7 @@ class GroupShuffler {
         // Display the results
         this.renderSessions();
 
-        this.showStatus("Successfully generated groups for 12 sessions.");
+        this.showStatus("Successfully generated groups for 12 sessions with substitutes.");
     }
 
     renderSessions() {
@@ -362,34 +438,80 @@ class GroupShuffler {
                         const groupCard = document.createElement('div');
                         groupCard.className = 'group-card';
 
+                        // Count core members and substitutes
+                        const coreMembers = group.filter(s => !s.isSubstitute);
+                        const substitutes = group.filter(s => s.isSubstitute);
+
                         const groupHeader = document.createElement('div');
                         groupHeader.className = 'group-header';
                         groupHeader.innerHTML = `
                             <span>Group ${groupIndex + 1}</span>
                             <span class="tooltip">
                                 <i class="fas fa-info-circle"></i>
-                                <span class="tooltip-text">${group.length} students</span>
+                                <span class="tooltip-text">${coreMembers.length} core + ${substitutes.length} substitutes</span>
                             </span>
                         `;
 
-                        const studentsList = document.createElement('ul');
-                        studentsList.className = 'students-list';
+                        // Create core members list
+                        const coreList = document.createElement('div');
+                        coreList.className = 'student-section';
 
-                        group.forEach(student => {
+                        const coreTitle = document.createElement('div');
+                        coreTitle.className = 'section-title';
+                        coreTitle.textContent = 'Core Members';
+                        coreList.appendChild(coreTitle);
+
+                        const coreStudentsList = document.createElement('ul');
+                        coreStudentsList.className = 'students-list';
+
+                        coreMembers.forEach(student => {
                             const studentItem = document.createElement('li');
                             studentItem.className = `student-item student-id-${student.id}`;
                             if (student.tag === 'ASC') studentItem.classList.add('student-asc');
+                            if (student.isDuplicate) studentItem.classList.add('student-duplicate');
 
                             studentItem.innerHTML = `
                                 <span class="student-name"><span class="student-id">#${student.id}</span> ${student.name}</span>
                                 <span class="tag tag-${student.tag.toLowerCase()}">${student.tag}</span>
                             `;
 
-                            studentsList.appendChild(studentItem);
+                            coreStudentsList.appendChild(studentItem);
                         });
 
+                        coreList.appendChild(coreStudentsList);
+
+                        // Create substitutes list
+                        const subList = document.createElement('div');
+                        subList.className = 'student-section substitutes-section';
+
+                        const subTitle = document.createElement('div');
+                        subTitle.className = 'section-title';
+                        subTitle.textContent = 'Substitutes';
+                        subList.appendChild(subTitle);
+
+                        const subStudentsList = document.createElement('ul');
+                        subStudentsList.className = 'students-list';
+
+                        substitutes.forEach(student => {
+                            const studentItem = document.createElement('li');
+                            studentItem.className = `student-item student-id-${student.id} student-substitute`;
+                            if (student.tag === 'ASC') studentItem.classList.add('student-asc');
+                            if (student.isDuplicate) studentItem.classList.add('student-duplicate');
+
+                            studentItem.innerHTML = `
+                                <span class="student-name"><span class="student-id">#${student.id}</span> ${student.name}</span>
+                                <span class="tag tag-${student.tag.toLowerCase()}">${student.tag}</span>
+                            `;
+
+                            subStudentsList.appendChild(studentItem);
+                        });
+
+                        subList.appendChild(subStudentsList);
+
+                        // Assemble the group card
                         groupCard.appendChild(groupHeader);
-                        groupCard.appendChild(studentsList);
+                        groupCard.appendChild(coreList);
+                        groupCard.appendChild(subList);
                         rowElement.appendChild(groupCard);
                     }
                 }
@@ -416,7 +538,7 @@ class GroupShuffler {
             const sessionData = [];
 
             // Add header row
-            const headerRow = ["Group", "Student ID", "Name", "Tag"];
+            const headerRow = ["Group", "Role", "Student ID", "Name", "Tag"];
             sessionData.push(headerRow);
 
             // Add data rows
@@ -424,9 +546,10 @@ class GroupShuffler {
                 group.forEach(student => {
                     sessionData.push([
                         `Group ${groupIndex + 1}`,
+                        student.isSubstitute ? 'Substitute' : 'Core',
                         student.id,
                         student.name,
-                        student.tag
+                        student.tag + (student.isDuplicate ? ' (Duplicate)' : '')
                     ]);
                 });
             });
