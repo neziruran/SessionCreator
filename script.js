@@ -4,28 +4,28 @@ let currentEditingId = null;
 
 // Predefined questions based on the questionnaire
 const questions = [
-    "Els dies que faltin a les classes, els explicaries els deures.",
-    "Quan estigueu en fila, tu et posaries al seu costat.",
-    "Jugaries amb ells/es després de l'escola.",
-    "Els deixaries el teu llapis o bolígraf.",
-    "Els ajudaries a resoldre problemes de matemàtiques.",
-    "Els/les protegiríeu si altres nens/es es burlessin d'ells.",
-    "Parlaries amb ells/es durant el temps lliure a classe.",
-    "Els/les convidaries a casa teva.",
-    "Seuries al costat d'ells/es a classe.",
-    "En el teu temps lliure a l'escola, jugaries amb ells/es.",
-    "A classe, compartiríeu amb ells/es un secret que només uns quants nens/es saben.",
+    "Els dies que faltaven a les classes, els explicaries els deures.",
+    "Quan estàvem en fila, tu em posava al seu costat.",
+    "Jugaries amb ells després de l'escola.",
+    "Els prestaries el teu llapis o bolígraf.",
+    "Els ajudaria a resoldre problemes de matemàtiques.",
+    "Els protegiríeu si altres nins es burguessin d'ells.",
+    "Parlaries amb ells durant el temps lliure a classe.",
+    "Els convidaries a casa teva.",
+    "T'asseieses al costat d'ells a classe.",
+    "En el teu temps lliure a l'escola, jugaries amb ells.",
+    "A classe, compartiríeu amb ells un secret que només uns quants nens sabien.",
     "T'hi acostaries i els diries \"hola\".",
-    "Compartiries part del teu menjar amb ells/es.",
-    "A les sortides, us asseurieu al seu costat a l'autocar.",
-    "De vegades els trucaries des del teu telèfon o els enviarieu missatges.",
-    "Estarieu al seu costat fins i tot quan fessin alguna cosa malament.",
-    "Els explicaries coses de tu mateix (parlaries de tu mateix amb ells/es)",
-    "Els ajudaries amb el treball de grup de classe.",
-    "Els dirieu paraules boniques per les coses en que van tenir exit.",
-    "Els presentaríeu als vostres amics/gues.",
-    "Quan jugueu, els/les escollirieu per jugar al vostre equip.",
-    "Els explicarieu coses sobre vosaltres mateixos/es que mai havieu dit a ningu altre."
+    "Compartiries part del teu menjar amb ells.",
+    "En els viatges escolars, us asseieu al seu costat a l'autobús.",
+    "De vegades els trucaries des del teu telèfon o els enviaves missatges de text.",
+    "Estaries del seu costat fins i tot quan fessin alguna cosa malament.",
+    "Els diries de tu mateix (parlaries de tu mateix amb ells).",
+    "Els ajudaria amb el treball de classe compartit.",
+    "Els lloaríeu per les coses en què van tenir èxit.",
+    "Els presentaríeu als vostres amics.",
+    "Quan jugueu, els escolliu al vostre equip.",
+    "Els diríeu coses sobre vosaltres mateixos que mai abans havíeu dit a ningú."
 ];
 
 // Second questionnaire data
@@ -106,7 +106,7 @@ function generateQuestions() {
                 <div class="q2-question">
                     <div class="q2-statements">
                         <div class="left-statement">← ${question.leftStatement}</div>
-                        <div class="center-text">PERÒ</div>
+                        <div class="center-text"></div>
                         <div class="right-statement">${question.rightStatement} →</div>
                     </div>
                     <div class="q2-options">
