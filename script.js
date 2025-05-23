@@ -66,21 +66,18 @@ function init() {
 }
 
 function switchToQuestionnaire(questionnaireNum) {
-    // 1️⃣ First clear out whatever form fields are currently in the DOM
-    clearForm();
+  // 1) Flip the mode
+  currentQuestionnaire = questionnaireNum;
 
-    // 2️⃣ Now flip the mode
-    currentQuestionnaire = questionnaireNum;
+  // 2) Update button styles
+  document.querySelectorAll('.questionnaire-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.id === `q${questionnaireNum}-btn`)
+  );
 
-    // 3️⃣ Update the active button styling
-    document.querySelectorAll('.questionnaire-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.getElementById(`q${questionnaireNum}-btn`).classList.add('active');
-
-    // 4️⃣ Regenerate the questions for the newly-selected questionnaire
-    generateQuestions();
+  // 3) Re-generate the questions from scratch
+  generateQuestions();
 }
+
 
 function generateQuestions() {
     const container = document.getElementById('questionsContainer');
