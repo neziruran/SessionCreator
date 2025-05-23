@@ -3,66 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Group Shuffler</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Questionnaire Data Collector</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Add SheetJS library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Classroom Group Shuffler</h1>
-            <p>Create optimal student groups with smart rotation to ensure diverse collaboration</p>
-        </div>
-    </header>
-
     <div class="container">
-        <div class="file-drop-area" id="dropArea">
-            <i class="file-icon fas fa-file-excel"></i>
-            <div class="file-info">Drag & drop your Excel file here or click to browse</div>
-            <div class="file-info"><small>Excel file must contain "full names" and "tag" columns</small></div>
-            <div id="fileNameDisplay"></div>
-            <input type="file" accept=".xlsx,.xls" class="file-input" id="fileInput">
+        <div class="header">
+            <h1>📋 Questionnaire Data Collector</h1>
+            <p>Student Response Management System</p>
         </div>
 
-        <div class="controls">
-            <button id="loadExcelBtn" class="btn btn-primary">
-                <i class="fas fa-file-import"></i> Load Students from Excel
-            </button>
-            <button id="createStructureBtn" class="btn btn-success">
-                <i class="fas fa-random"></i> Create Group Structure
-            </button>
-            <button id="exportSessionsBtn" class="btn btn-warning btn-disabled" disabled>
-                <i class="fas fa-file-export"></i> Export to Excel
-            </button>
-            <a href="live-session-tracker.html" class="btn btn-secondary">
-                <i class="fas fa-tasks"></i> Session Management
-            </a>
-        </div>
-        <div id="studentFilterContainer" class="student-filter-container" style="display: none;">
-            <label for="studentFilter">
-                <i class="fas fa-search"></i> Find Student:
-            </label>
-            <select id="studentFilter" class="student-filter">
-                <option value="">All Students</option>
-            </select>
+        <div class="questionnaire-selector">
+            <div class="selector-content">
+                <h3>📋 Select Questionnaire Type</h3>
+                <div class="selector-buttons">
+                    <button class="questionnaire-btn active" onclick="switchToQuestionnaire(1)" id="q1-btn">
+                        <div class="btn-icon">🤝</div>
+                        <div class="btn-text">
+                            <strong>Social Inclusion</strong>
+                            <small>22 Questions</small>
+                        </div>
+                    </button>
+                    <button class="questionnaire-btn" onclick="switchToQuestionnaire(2)" id="q2-btn">
+                        <div class="btn-icon">🧠</div>
+                        <div class="btn-text">
+                            <strong>Self-Perception</strong>
+                            <small>11 Questions</small>
+                        </div>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div id="statusMessage" style="display: none;" class="status-message"></div>
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('add-student')">Add Student</button>
+                <button class="tab" onclick="showTab('manage-students')">Manage Students</button>
+                <button class="tab" onclick="showTab('summary')">Summary</button>
+                <button class="tab" onclick="showTab('export')">Export</button>
+            </div>
 
-        <div class="sessions-wrapper">
-            <div class="session-tabs" id="sessionTabs"></div>
-            <div id="sessionsContainer" class="sessions-container">
-                <div class="empty-state">
-                    <i class="fas fa-users empty-state-icon"></i>
-                    <h3>No Groups Created Yet</h3>
-                    <p>Load students from Excel and click "Create Group Structure" to generate groups</p>
+            <!-- Add Student Tab -->
+            <div id="add-student" class="tab-content active">
+                <div class="form-section fade-in">
+                    <h3>Student Information</h3>
+                    <div class="form-group">
+                        <label for="studentName">Student Name:</label>
+                        <input type="text" id="studentName" placeholder="Enter student name">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentId">Student ID:</label>
+                        <input type="text" id="studentId" placeholder="Enter student ID">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Questionnaire Responses</h3>
+                    <div class="questions-container" id="questionsContainer">
+                        <!-- Questions will be dynamically generated here -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
+                    <button class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+                </div>
+            </div>
+
+            <!-- Manage Students Tab -->
+            <div id="manage-students" class="tab-content">
+                <div class="form-section">
+                    <h3>Registered Students</h3>
+                    <div id="studentsContainer" class="students-grid">
+                        <!-- Students will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Tab -->
+            <div id="summary" class="tab-content">
+                <div class="form-section">
+                    <h3>Summary of All Students</h3>
+                    <div id="summaryContainer">
+                        <!-- Summary table will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Export Tab -->
+            <div id="export" class="tab-content">
+                <div class="export-section">
+                    <h3>Export Data</h3>
+                    <p>Export all student data in CSV or Excel format</p>
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-success" onclick="exportToCSV()">📄 Export to CSV</button>
+                        <button class="btn btn-success" onclick="exportToExcel()">📊 Export to Excel</button>
+                    </div>
+                    <div id="exportStatus" style="margin-top: 20px;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="scripts.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
