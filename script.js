@@ -135,30 +135,16 @@ function generateQuestions() {
     }
 }
 
-function showTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Remove active class from all tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Show selected tab content
+function showTab(tabName, event) {
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabName).classList.add('active');
-    
-    // Add active class to clicked tab (corrected line)
-    event.currentTarget.classList.add('active');
-    
-    // Update displays when switching to relevant tabs
-    if (tabName === 'manage-students') {
-        updateStudentsDisplay();
-    } else if (tabName === 'summary') {
-        updateSummaryDisplay();
-    }
+    event.target.classList.add('active');
+
+    if (tabName === 'manage-students') updateStudentsDisplay();
+    else if (tabName === 'summary') updateSummaryDisplay();
 }
+
 
 function addStudent() {
     const name = document.getElementById('studentName').value.trim();
