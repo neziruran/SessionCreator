@@ -52,11 +52,11 @@ const questionnaire2Options = [
 
 let currentQuestionnaire = 1;
 const answerOptions = [
-    "Sí, sempre ho faria",
-    "Ho faria sovint",
-    "Ni Sí ni No",
+    "Segur que no ho faria mai",
     "Ho faria poques vegades",
-    "Segur que no ho faria mai"
+    "Ni Sí ni No",
+    "Ho faria sovint",
+    "Sí, sempre ho faria"
 ];
 
 function init() {
@@ -105,8 +105,9 @@ function generateQuestions() {
                 <label>Q${question.id}:</label>
                 <div class="q2-question">
                     <div class="q2-statements">
-                        <div class="left-statement">${question.leftStatement}</div>
-                        <div class="right-statement">${question.rightStatement}</div>
+                        <div class="left-statement">← ${question.leftStatement}</div>
+                        <div class="center-text">PERÒ</div>
+                        <div class="right-statement">${question.rightStatement} →</div>
                     </div>
                     <div class="q2-options">
                         <div class="left-options">
