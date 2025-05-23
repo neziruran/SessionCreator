@@ -105,9 +105,8 @@ function generateQuestions() {
                 <label>Q${question.id}:</label>
                 <div class="q2-question">
                     <div class="q2-statements">
-                        <div class="left-statement">← ${question.leftStatement}</div>
-                        <div class="center-text"></div>
-                        <div class="right-statement">${question.rightStatement} →</div>
+                        <div class="left-statement">${question.leftStatement}</div>
+                        <div class="right-statement">${question.rightStatement}</div>
                     </div>
                     <div class="q2-options">
                         <div class="left-options">
