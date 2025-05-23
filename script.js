@@ -45,7 +45,7 @@ const questionnaire2Questions = [
 
 const questionnaire2Options = [
     "Molt cert per a mi",
-    "Una mica de veritat per a mi",
+    "Una mena de veritat per a mi",
     "Una mena de veritat per a mi",
     "Realment cert per a mi"
 ];
@@ -56,7 +56,7 @@ const answerOptions = [
     "Ho faria sovint",
     "Ni Sí ni No",
     "Ho faria poques vegades",
-    "Segur que no ho faria mai",
+    "Segur que no ho faria mai"
 ];
 
 function init() {
