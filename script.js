@@ -46,11 +46,11 @@ const questionnaire2Questions = [
 const questionnaire2Options = {
     left: [
         "Molt cert per a mi",
-        "Una mena de veritat per a mi"
+        "Una mica cert per a mi"
     ],
     right: [
-        "Una mena de veritat per a mi", 
-        "Realment cert per a mi"
+        "Molt cert per a mi",
+        "Una mica cert per a mi"
     ]
 };
 
