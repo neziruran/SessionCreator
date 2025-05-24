@@ -112,15 +112,18 @@ function generateQuestions() {
                         <tr>
                             <th>Molt cert<br>per a mi</th>
                             <th>Una mica<br>cert per a<br>mi</th>
+                            <th>A alguns<br>nens/es/es<br>els costa fer<br>amics/gues.</th>
+                            <th>← →<br>PERÒ</th>
+                            <th>Altres<br>nens/es<br>troben que<br>és molt fàcil<br>fer<br>amics/gues.</th>
                             <th>Una mica<br>cert per a<br>mi</th>
                             <th>Molt cert<br>per a mi</th>
                         </tr>
                         <tr>
                             <td><input type="radio" name="q2_${question.id}" value="L2" required></td>
                             <td><input type="radio" name="q2_${question.id}" value="L1" required></td>
-                            <td rowspan="2" class="statement-cell">${question.leftStatement}</td>
-                            <td rowspan="2" class="pero-cell">← →<br>PERÒ</td>
-                            <td rowspan="2" class="statement-cell">${question.rightStatement}</td>
+                            <td class="statement-cell">${question.leftStatement}</td>
+                            <td class="pero-cell">← →<br>PERÒ</td>
+                            <td class="statement-cell">${question.rightStatement}</td>
                             <td><input type="radio" name="q2_${question.id}" value="R1" required></td>
                             <td><input type="radio" name="q2_${question.id}" value="R2" required></td>
                         </tr>
@@ -131,6 +134,7 @@ function generateQuestions() {
         });
     }
 }
+
 
 function showTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
