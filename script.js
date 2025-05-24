@@ -104,27 +104,30 @@ function generateQuestions() {
     } else {
         questionnaire2Questions.forEach((question) => {
             const questionDiv = document.createElement('div');
-            questionDiv.className = 'question-item q2-style';
+            questionDiv.className = 'question-item q2-table-style';
             questionDiv.innerHTML = `
                 <label>Q${question.id}:</label>
-                <div class="q2-question">
-                    <div class="q2-statements">
-                        <div class="left-statement">← ${question.leftStatement}</div>
-                        <div class="center-text">PERÒ</div>
-                        <div class="right-statement">${question.rightStatement} →</div>
-                    </div>
-                    <div class="q2-options">
-                        <div class="left-options">
-                            ${questionnaire2Options.left.map((option, optIndex) =>
-                `<label><input type="radio" name="q2_${question.id}" value="L${optIndex + 1}" required> ${option}</label>`
-            ).join('')}
-                        </div>
-                        <div class="right-options">
-                            ${questionnaire2Options.right.map((option, optIndex) =>
-                `<label><input type="radio" name="q2_${question.id}" value="R${optIndex + 1}" required> ${option}</label>`
-            ).join('')}
-                        </div>
-                    </div>
+                <div class="q2-table-container">
+                    <table class="q2-table">
+                        <tr>
+                            <th>Molt cert<br>per a mi</th>
+                            <th>Una mica<br>cert per a<br>mi</th>
+                            <th>A alguns<br>nens/es/es<br>els costa fer<br>amics/gues.</th>
+                            <th>← →<br>PERÒ</th>
+                            <th>Altres<br>nens/es<br>troben que<br>és molt fàcil<br>fer<br>amics/gues.</th>
+                            <th>Una mica<br>cert per a<br>mi</th>
+                            <th>Molt cert<br>per a mi</th>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="q2_${question.id}" value="L2" required></td>
+                            <td><input type="radio" name="q2_${question.id}" value="L1" required></td>
+                            <td rowspan="2" class="statement-cell">${question.leftStatement}</td>
+                            <td rowspan="2" class="pero-cell">← →<br>PERÒ</td>
+                            <td rowspan="2" class="statement-cell">${question.rightStatement}</td>
+                            <td><input type="radio" name="q2_${question.id}" value="R1" required></td>
+                            <td><input type="radio" name="q2_${question.id}" value="R2" required></td>
+                        </tr>
+                    </table>
                 </div>
             `;
             container.appendChild(questionDiv);
