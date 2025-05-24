@@ -112,9 +112,6 @@ function generateQuestions() {
                         <tr>
                             <th>Molt cert<br>per a mi</th>
                             <th>Una mica<br>cert per a<br>mi</th>
-                            <th>A alguns<br>nens/es/es<br>els costa fer<br>amics/gues.</th>
-                            <th>← →<br>PERÒ</th>
-                            <th>Altres<br>nens/es<br>troben que<br>és molt fàcil<br>fer<br>amics/gues.</th>
                             <th>Una mica<br>cert per a<br>mi</th>
                             <th>Molt cert<br>per a mi</th>
                         </tr>
