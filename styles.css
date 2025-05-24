@@ -128,16 +128,17 @@ body {
 .q2-table td,
 .q2-table th {
     border: 2px solid #333;
-    padding: 12px;
+    padding: 8px;
     text-align: center;
     vertical-align: middle;
 }
 
-.q2-table .header-row th {
+.q2-table th {
     background-color: #f8f9fa;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     line-height: 1.2;
+    padding: 10px 8px;
 }
 
 .statement-cell {
@@ -153,13 +154,14 @@ body {
 .pero-cell {
     background-color: #fff5f5;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 0.9rem;
     min-width: 80px;
     color: #333;
+    padding: 15px 8px;
 }
 
 .q2-table input[type="radio"] {
-    transform: scale(1.3);
+    transform: scale(1.2);
     cursor: pointer;
     margin: 0;
 }
@@ -169,7 +171,8 @@ body {
 .q2-table td:nth-child(6),
 .q2-table td:last-child {
     background-color: #fafafa;
-    min-width: 60px;
+    min-width: 70px;
+    padding: 12px 8px;
 }
 
 /* Hide old Q2 styles */
