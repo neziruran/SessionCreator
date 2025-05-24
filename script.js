@@ -43,20 +43,24 @@ const questionnaire2Questions = [
     { id: 11, leftStatement: "Alguns nens no ho fan bé amb els nous jocs a l'aire lliure", rightStatement: "Altres nens són bons en jocs nous de seguida" }
 ];
 
-const questionnaire2Options = [
-    "Molt cert per a mi",
-    "Una mena de veritat per a mi",
-    "Una mena de veritat per a mi",
-    "Realment cert per a mi"
-];
+const questionnaire2Options = {
+    left: [
+        "Molt cert per a mi",
+        "Una mena de veritat per a mi"
+    ],
+    right: [
+        "Una mena de veritat per a mi", 
+        "Realment cert per a mi"
+    ]
+};
 
 let currentQuestionnaire = 1;
 const answerOptions = [
-    "Sí, sempre ho faria",
-    "Ho faria sovint",
-    "Ni Sí ni No",
+    "Segur que no ho faria mai",
     "Ho faria poques vegades",
-    "Segur que no ho faria mai"
+    "Ni Sí ni No",
+    "Ho faria sovint",
+    "Sí, sempre ho faria"
 ];
 
 function init() {
@@ -66,18 +70,14 @@ function init() {
 }
 
 function switchToQuestionnaire(questionnaireNum) {
-  // 1) Flip the mode
-  currentQuestionnaire = questionnaireNum;
-
-  // 2) Update button styles
-  document.querySelectorAll('.questionnaire-btn').forEach(btn =>
-    btn.classList.toggle('active', btn.id === `q${questionnaireNum}-btn`)
-  );
-
-  // 3) Re-generate the questions from scratch
-  generateQuestions();
+    currentQuestionnaire = questionnaireNum;
+    document.querySelectorAll('.questionnaire-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`q${questionnaireNum}-btn`).classList.add('active');
+    clearForm();
+    generateQuestions();
 }
-
 
 function generateQuestions() {
     const container = document.getElementById('questionsContainer');
@@ -115,12 +115,12 @@ function generateQuestions() {
                     </div>
                     <div class="q2-options">
                         <div class="left-options">
-                            ${questionnaire2Options.map((option, optIndex) =>
+                            ${questionnaire2Options.left.map((option, optIndex) =>
                 `<label><input type="radio" name="q2_${question.id}" value="L${optIndex + 1}" required> ${option}</label>`
             ).join('')}
                         </div>
                         <div class="right-options">
-                            ${questionnaire2Options.map((option, optIndex) =>
+                            ${questionnaire2Options.right.map((option, optIndex) =>
                 `<label><input type="radio" name="q2_${question.id}" value="R${optIndex + 1}" required> ${option}</label>`
             ).join('')}
                         </div>
@@ -132,16 +132,15 @@ function generateQuestions() {
     }
 }
 
-function showTab(tabName, event) {
+function showTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabName).classList.add('active');
     event.target.classList.add('active');
-
+    
     if (tabName === 'manage-students') updateStudentsDisplay();
     else if (tabName === 'summary') updateSummaryDisplay();
 }
-
 
 function addStudent() {
     const name = document.getElementById('studentName').value.trim();
@@ -306,7 +305,9 @@ function updateSummaryDisplay() {
                     if (!answer) return '<td>-</td>';
                     let text = student.questionnaireType === 1 
                         ? answer.answer 
-                        : questionnaire2Options[parseInt(answer.value.slice(1)) - 1];
+                        : (answer.value.startsWith('L') 
+                            ? questionnaire2Options.left[parseInt(answer.value.slice(1)) - 1]
+                            : questionnaire2Options.right[parseInt(answer.value.slice(1)) - 1]);
                     return `<td>${text}</td>`;
                 }).join('')}
             </tr>`;
@@ -328,7 +329,9 @@ function exportToCSV() {
             const answer = student.answers[`Q${i+1}`];
             return `"${answer ? (student.questionnaireType === 1 
                 ? answer.answer 
-                : questionnaire2Options[parseInt(answer.value.slice(1)) - 1]) : ''}"`;
+                : (answer.value.startsWith('L') 
+                    ? questionnaire2Options.left[parseInt(answer.value.slice(1)) - 1]
+                    : questionnaire2Options.right[parseInt(answer.value.slice(1)) - 1])) : ''}"`;
         }).join(',') + '\n';
     });
     
@@ -352,7 +355,9 @@ function exportToExcel() {
                 const answer = student.answers[`Q${i+1}`];
                 return answer ? (student.questionnaireType === 1 
                     ? answer.answer 
-                    : questionnaire2Options[parseInt(answer.value.slice(1)) - 1]) : '';
+                    : (answer.value.startsWith('L') 
+                        ? questionnaire2Options.left[parseInt(answer.value.slice(1)) - 1]
+                        : questionnaire2Options.right[parseInt(answer.value.slice(1)) - 1])) : '';
             })
         ])
     ];
