@@ -19,50 +19,6 @@ body {
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
-.q2-style {
-    flex-direction: column;
-    align-items: stretch;
-}
-
-.q2-question {
-    width: 100%;
-}
-
-.q2-statements {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    gap: 20px;
-}
-
-.left-statement, .right-statement {
-    flex: 1;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 5px;
-    font-size: 0.9rem;
-}
-
-.q2-options {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.left-options, .right-options {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-    .left-options label, .right-options label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-    }
-
 .questionnaire-selector {
     margin-bottom: 30px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -100,24 +56,24 @@ body {
     backdrop-filter: blur(10px);
 }
 
-    .questionnaire-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
+.questionnaire-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
 
-    .questionnaire-btn.active {
-        background: rgba(255, 255, 255, 0.95);
-        border-color: white;
-        color: #333;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
+.questionnaire-btn.active {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: white;
+    color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
 
-        .questionnaire-btn.active .btn-icon {
-            color: #667eea;
-        }
+.questionnaire-btn.active .btn-icon {
+    color: #667eea;
+}
 
 .btn-icon {
     font-size: 2rem;
@@ -147,68 +103,77 @@ body {
     opacity: 0.8;
 }
 
-/* Rest of the existing Q2 styles remain the same */
-.q2-style {
+/* Q2 Table Styles */
+.q2-table-style {
     flex-direction: column;
     align-items: stretch;
+    padding: 20px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    margin-bottom: 20px;
 }
 
-.q2-question {
+.q2-table-container {
     width: 100%;
+    overflow-x: auto;
 }
 
-.q2-statements {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: 15px;
+.q2-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.85rem;
 }
 
-.left-statement, .right-statement {
-    flex: 2;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    border: 1px solid #e0e0e0;
+.q2-table th,
+.q2-table td {
+    border: 2px solid #333;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
 }
 
-.center-text {
-    flex: 0;
+.q2-table th {
+    background-color: #f8f9fa;
     font-weight: bold;
-    color: #666;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.statement-cell {
+    background-color: #f0f8ff;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    text-align: left;
+    padding: 12px;
+    max-width: 200px;
+}
+
+.pero-cell {
+    background-color: #fff5f5;
+    font-weight: bold;
     font-size: 0.9rem;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
 }
 
-.q2-options {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
+.q2-table input[type="radio"] {
+    transform: scale(1.2);
+    cursor: pointer;
 }
 
-.left-options, .right-options {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.q2-table td {
+    min-width: 80px;
 }
 
-    .left-options label, .right-options label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-    }
-
-        .left-options label:hover, .right-options label:hover {
-            background-color: #f0f8ff;
-        }
-
+/* Hide old Q2 styles */
+.q2-question,
+.q2-statements,
+.q2-options,
+.left-options,
+.right-options {
+    display: none;
+}
 
 .container {
     max-width: 1200px;
@@ -486,4 +451,13 @@ body {
     padding: 30px;
     background: #f8f9fa;
     border-radius: 15px;
-    margin-top:
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
